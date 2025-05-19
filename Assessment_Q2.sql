@@ -1,4 +1,5 @@
 --- Q2. Transaction frequency analysis
+--- Calculate the number of transactions per customer per month
 WITH monthly_transactions AS (
     SELECT s.owner_id,
         EXTRACT(YEAR FROM s.transaction_date) AS year,
@@ -7,12 +8,14 @@ WITH monthly_transactions AS (
     FROM savings_savingsaccount s
     GROUP BY s.owner_id, year, month
 ),
+--- get the average number of transactions per customer per month
 avg_transactions_per_customer AS (
     SELECT owner_id,
         AVG(transactions_count) AS avg_monthly_transactions
     FROM monthly_transactions
     GROUP BY owner_id
 ),
+--- segment customers according to their transaction frequency per month
 categorized_customer AS (
     SELECT owner_id,
         avg_monthly_transactions,
@@ -23,6 +26,7 @@ categorized_customer AS (
         END AS frequency_category
     FROM avg_transactions_per_customer
 )
+--- aggregate by freuqency category
 SELECT frequency_category,
     COUNT(owner_id) AS customer_count,
     ROUND(AVG(avg_monthly_transactions), 1) AS avg_transactions_per_month
