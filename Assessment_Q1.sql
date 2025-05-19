@@ -3,6 +3,7 @@ SELECT * FROM users_customuser;
 SELECT * FROM savings_savingsaccount;
 SELECT * FROM plans_plan; 
 
+--- CTE to calculate total number of savings accounts and total savings per customer
 WITH savings_details AS ( 
 	SELECT owner_id,
         COUNT(*) AS savings_count,
@@ -11,6 +12,7 @@ WITH savings_details AS (
     WHERE confirmed_amount > 0 
     GROUP BY owner_id
 ),
+--- CTE to calculate total number of funded investment plans and total investment per customer
 investment_details AS (
 	SELECT owner_id,
 		COUNT(*) AS investment_count,
@@ -19,8 +21,9 @@ investment_details AS (
     WHERE amount > 0 AND is_a_fund = 1
 	GROUP BY owner_id
     )
+--- Retrive customers with both savings and investment along with their total deposit
 SELECT s.owner_id,
-	CONCAT(u.first_name, ' ', u.last_name) AS name,
+	CONCAT(u.first_name, ' ', u.last_name) AS name, --- full name of the customer as the "name" column is NULL
     s.savings_count,
     i.investment_count,
     ROUND(s.total_savings + i.total_investment, 2) AS total_deposits
