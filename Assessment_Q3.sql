@@ -1,4 +1,5 @@
 --- Account inactivity alert
+--- get most recent transaction date for each savings plan
 WITH last_transactions AS (
     SELECT plan_id,
         MAX(transaction_date) AS last_transaction_date
@@ -6,6 +7,7 @@ WITH last_transactions AS (
     WHERE confirmed_amount > 0
     GROUP BY plan_id
 ),
+--- identify active savings or investment plans
 active_plans AS (
     SELECT id AS plan_id,
         owner_id,
@@ -17,6 +19,7 @@ active_plans AS (
     FROM plans_plan
     WHERE is_regular_savings = 1 OR is_a_fund = 1
 )
+--- calculate inactivity
 SELECT 
     ap.plan_id,
     ap.owner_id,
